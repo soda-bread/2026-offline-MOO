@@ -27,7 +27,7 @@ def plot_obj_2d(F, xlim=(0, 1), ylim=(0, 1)):
             y=pareto_F[:, 1],
             mode='markers',
             name='Pareto Front',
-            marker=dict(size=7, color='#FF7F0E', opacity=0.9, symbol='diamond')
+            marker=dict(size=7, color='#B07AA1', opacity=0.9, symbol='diamond')
         ))
         fig.update_layout(
             xaxis_title='f1',
@@ -153,5 +153,4 @@ def plot_hv_history(
         plt.show()
     else:
         plt.close(fig)
-
 
