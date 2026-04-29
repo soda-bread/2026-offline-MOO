@@ -1,4 +1,4 @@
-"""Python script version of `Exp1_GPR_(RBF).ipynb`.
+"""Python script version of `Exp1_GPR-RBF[experiment].ipynb`.
 
 This script keeps the notebook's core workflow and adds a command-line entry
 for running the 30x bias-variance experiment.
@@ -85,7 +85,7 @@ def run_single_gpr(X_train, y_train, X_test, y_test, plot: bool = True):
     pred_mean, pred_std, mean_f1, std_f1, mean_f2, std_f2 = gpr_pred_mean_std(
         model_f1, model_f2, X_test, noiseless=True
     )
-    print(f"\nGPR(RBF) MSE: {mean_squared_error(y_test, pred_mean):.2e}\n")
+    print(f"\nGPR(RBF) MSE: {mean_squared_error(y_test, pred_mean):.3e}\n")
 
     if plot:
         plot_y_true_pred(y_test, pred_mean)
@@ -101,7 +101,7 @@ def run_high_bias_or_variance(X_train, y_train, X_test, y_test, lengthscale_weig
     print_gpr_params(model_f1, model_f2)
 
     pred_mean, pred_std, _, _, _, _ = gpr_pred_mean_std(model_f1, model_f2, X_test, noiseless=True)
-    print(f"\nGPR(RBF) MSE: {mean_squared_error(y_test, pred_mean):.2e}")
+    print(f"\nGPR(RBF) MSE: {mean_squared_error(y_test, pred_mean):.3e}")
 
     if plot:
         plot_y_true_pred(y_test, pred_mean)
@@ -221,10 +221,21 @@ def summarize_ea_results(results):
 
 
 def print_ea_summary(summary):
-    print(f"MSE: Mean = {summary['mse_mean']:.2e}, Std = {summary['mse_std']:.2e}")
-    print(f"IGD+: Mean = {summary['igd_plus_mean']:.2e}, Std = {summary['igd_plus_std']:.2e}")
-    print(f"Sur HV: Mean = {summary['hv_surrogate_mean']:.2f}, Std = {summary['hv_surrogate_std']:.2f}")
-    print(f"Real HV: Mean = {summary['hv_real_mean']:.2f}, Std = {summary['hv_real_std']:.2f}")
+    print(f"MSE: Mean = {summary['mse_mean']:.3e}, Std = {summary['mse_std']:.3e}")
+    print(f"IGD+: Mean = {summary['igd_plus_mean']:.3e}, Std = {summary['igd_plus_std']:.3e}")
+    print(f"Sur HV: Mean = {summary['hv_surrogate_mean']:.3f}, Std = {summary['hv_surrogate_std']:.3f}")
+    print(f"Real HV: Mean = {summary['hv_real_mean']:.3f}, Std = {summary['hv_real_std']:.3f}")
+
+
+def format_ea_summary_for_record(summary):
+    return {
+        key: f"{value:.3f}" if key.startswith("hv_") else f"{value:.3e}"
+        for key, value in summary.items()
+    }
+
+
+def format_scientific_3(value):
+    return f"{value:.3e}"
 
 
 def run_ea_experiment(problem, problem_name, n_gen, pop_size, model_f1, model_f2, obj_min, obj_max, hv, igd_plus, seeds=range(1, 31)):
@@ -298,9 +309,9 @@ def run_ea_for_seed42_bias_variance_models(
             "model_type": model_type,
             "train_seed": 42,
             "lengthscale_weight": model_info["lengthscale_weight"],
-            "bias_squared": model_info["bias_squared"],
-            "variance": model_info["variance"],
-            **summary,
+            "bias_squared": format_scientific_3(model_info["bias_squared"]),
+            "variance": format_scientific_3(model_info["variance"]),
+            **format_ea_summary_for_record(summary),
         }
         summary_rows.append(row)
         write_rows_csv(output_dir / "optimization_summary_seed42_bias_variance_models.csv", summary_rows)
@@ -323,7 +334,7 @@ def main():
         "--run_bias_variance_ea",
         action="store_true",
         default=None,
-        help="After the 30-run bias-variance experiment, run EA for seed=42 high-bias and high-variance models.",
+        help="After the 30-run bias-variance experiment, run EA for seed=42 configured bias/variance models.",
     )
     parser.add_argument("--ea_seed_start", type=int, default=None)
     parser.add_argument("--ea_seed_end", type=int, default=None, help="Exclusive end for EA seeds; default runs seeds 1..30.")
@@ -413,15 +424,15 @@ def main():
         else:
             bias_squared, variance = result
 
-        print(f"{model_type} model -> Bias^2: {bias_squared:.6e}, Variance: {variance:.6e}")
+        print(f"{model_type} model -> Bias^2: {bias_squared:.3e}, Variance: {variance:.3e}")
 
         bias_variance_summary_rows.append({
             "problem_name": problem_name,
             "model_type": model_type,
             "n_runs": n_runs,
             "lengthscale_weight": lengthscale_weight,
-            "bias_squared": bias_squared,
-            "variance": variance,
+            "bias_squared": format_scientific_3(bias_squared),
+            "variance": format_scientific_3(variance),
         })
         seed42_models_by_type[model_type] = {
             "model_f1": seed42_model_f1,

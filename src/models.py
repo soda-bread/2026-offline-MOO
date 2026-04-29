@@ -15,18 +15,20 @@ class GPR_RBF:
         self.model = GPy.models.GPRegression(X, y, kernel, normalizer=True)
         self.model.optimize(messages=False)
 
-    def fit_high_bias_variance(self, X, y,lengthscale_weight):
+    def fit_high_bias_variance(self, X, y, lengthscale_weight):
         y = y.reshape(-1, 1)
         kernel = GPy.kern.RBF(input_dim=X.shape[1], ARD=True)
         self.model = GPy.models.GPRegression(X, y, kernel, normalizer=True)
         self.model.optimize(messages=False)
 
+        optimized_noise = float(self.model.Gaussian_noise.variance.values[0])
         kernel = GPy.kern.RBF(
             input_dim=X.shape[1],
             ARD=True,
             variance=kernel.variance,
             lengthscale=kernel.lengthscale * lengthscale_weight)
         self.model = GPy.models.GPRegression(X, y, kernel, normalizer=True)
+        self.model.Gaussian_noise.variance = optimized_noise
 
     def predict(self, X):
         y_mean, y_var = self.model.predict(X, include_likelihood=True)

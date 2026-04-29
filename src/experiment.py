@@ -111,10 +111,10 @@ def run_experiment(
 
       print(
           f"Seed {seed} | Time: {end_time - start_time:.2f}s | "
-          f"MSE: {mse:.2e} | "
-          f"igd+: {igd_plus_real:.2e} | "
-          f"Sur HV: {hv_surrogate:.2f} | "
-          f"Real HV: {hv_real:.2f} | "
+          f"MSE: {mse:.3e} | "
+          f"igd+: {igd_plus_real:.3e} | "
+          f"Sur HV: {hv_surrogate:.3f} | "
+          f"Real HV: {hv_real:.3f} | "
           f"Max obj: {max_obj} | "
           f"Max f_real: {max_obj_real}")
  

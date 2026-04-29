@@ -20,15 +20,17 @@ run_bias_variance_ea: true
 output_dir: outputs/exp1_gpr_rbf/dtlz1
 
 bias_variance_configs:
+  - model_type: normal
+    lengthscale_weight: 1.0
   - model_type: high_bias
     lengthscale_weight: 10.0
   - model_type: middle_bias
     lengthscale_weight: 5.0
   - model_type: low_bias
     lengthscale_weight: 2.0
-  - model_type: high_variance
-    lengthscale_weight: 0.1
-  - model_type: middle_variance
-    lengthscale_weight: 0.2
   - model_type: low_variance
     lengthscale_weight: 0.5
+  - model_type: middle_variance
+    lengthscale_weight: 0.2
+  - model_type: high_variance
+    lengthscale_weight: 0.1
