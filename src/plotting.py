@@ -19,7 +19,7 @@ def plot_obj_2d(F, xlim=(0, 1), ylim=(0, 1)):
                 y=F[:, 1],
                 mode='markers',
                 name='Objective Values',
-                marker=dict(size=6, color='#87CEEB', opacity=0.7)
+                marker=dict(size=6, color='#FF7F0E', opacity=0.7)
             )
         )
         fig.add_trace(go.Scatter(
@@ -153,4 +153,3 @@ def plot_hv_history(
         plt.show()
     else:
         plt.close(fig)
-

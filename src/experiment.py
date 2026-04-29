@@ -43,7 +43,7 @@ def run_experiment(
     if use_callback:
       callback_standard = EvaluatePreRealCallback(
           true_problem=problem,
-          plot_every=1,
+          plot_every=10,
           use_opt=True,
           dynamic_show=False,
           prefix="NSGA2-standard",

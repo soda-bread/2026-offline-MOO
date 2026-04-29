@@ -129,7 +129,7 @@ class EvaluatePreRealCallback(Callback):
     def notify(self, algorithm):
         gen = algorithm.n_gen
 
-        if gen % self.plot_every != 0:
+        if gen != 1 and gen % self.plot_every != 0:
             return
 
         pop = algorithm.opt if self.use_opt else algorithm.pop
