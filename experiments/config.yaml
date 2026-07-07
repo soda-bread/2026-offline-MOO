@@ -1,0 +1,66 @@
+problem_names:
+  - dtlz1
+  - dtlz2
+  - dtlz3
+  - dtlz4
+  - dtlz5
+  - dtlz6
+  - dtlz7
+  - omnitest
+  - truss2d
+  - welded_beam
+
+dtlz_n_var: 10
+omnitest_n_var: 2
+dtlz_n_obj: 2
+n_gen: 100
+pop_size: 100
+optimizer_run_specs:
+  - result_name: NSGA-II
+    optimizer_name: NSGA-II
+    use_dual_ranking: false
+  - result_name: Dual-Ranking+NSGA-II
+    optimizer_name: NSGA-II
+    use_dual_ranking: true
+  - result_name: MOEAD
+    optimizer_name: MOEAD
+    use_dual_ranking: false
+  - result_name: SMS-EMOA
+    optimizer_name: SMS-EMOA
+    use_dual_ranking: false
+seed_start: 1
+seed_end: 31
+train_seed: 42
+test_seed: 1
+sample_size: null
+val_size: 100
+test_size: 100
+calibration_k: 5
+knn_threshold_method: mean
+show_seed_output: False
+dual_ranking_target_coverage: 0.90
+dual_ranking_alpha_max: 500.0
+dual_ranking_alpha_step: 0.01
+dual_ranking_quantile: 0.90
+
+surrogates:
+  gpr_rbf:
+    use_surrogate: GPR_uncertainty
+  gpr_matern:
+    use_surrogate: GPR_uncertainty
+  autogluon_qr:
+    use_surrogate: QR_uncertainty
+    quantile_levels:
+      - 0.5
+      - 0.8
+      - 0.9
+      - 0.95
+  bnn:
+    use_surrogate: BNN_uncertainty
+    hidden:
+      - 6
+      - 3
+    lr: 5.0e-4
+    max_steps: 50000
+    patience: 15
+    fixed_sigma: 0.05

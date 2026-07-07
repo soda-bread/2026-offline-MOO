@@ -12,3 +12,11 @@ def print_gpr_params(model_f1, model_f2):
     print("f2 noise:", model_f2.model.Gaussian_noise.variance.values)
 
 
+def compute_bias_variance(preds, f_true):
+    preds = np.asarray(preds)
+    f_true = np.asarray(f_true)
+    
+    mean_pred = preds.mean(axis=0)
+    bias = mean_pred - f_true
+    variance = ((preds - mean_pred) ** 2).mean(axis=0)
+    return {"bias": bias,"variance": variance}

@@ -1,0 +1,34 @@
+1. f_sur形状和f_real 形状不同，然后f_sur和f_real有一部分重叠，shift不起作用
+truss2d GPR_RBF+NSGA-II / Dual-Ranking+NSGA-II / SMS-EMOA
+
+dtlz7 GPR_Matern+Dual-Ranking+NSGA-II / SMS-EMOA
+truss2d GPR_Matern+Dual-Ranking+NSGA-II [在 HV_xy_direction_counts 是负值]
+
+omnitest BNN+NSGA-II / Dual-Ranking+NSGA-II / MOEAD / SMS-EMOA
+
+truss2d TGPR-MO
+welded_beam TGPR-MO
+------------------------------------------------------------------------------------------------------
+
+2. HV_clip之后 clip了太多东西，让f_sur骤降，HV_shift比HV_sur离HV_real近或者距离差是接近0%
+dtlz4 GPR_RBF+NSGA-II / Dual-Ranking+NSGA-II / SMS-EMOA
+dtlz6 GPR_RBF+NSGA-II / Dual-Ranking+NSGA-II / SMS-EMOA
+
+dtlz2 GPR_Matern+Dual-Ranking+NSGA-II / SMS-EMOA
+dtlz5 GPR_Matern+Dual-Ranking+NSGA-II / SMS-EMOA
+dtlz6 GPR_Matern+NSGA-II / Dual-Ranking+NSGA-II / MOEAD / SMS-EMOA
+
+welded_beam Autogluon_QR+Dual-Ranking+NSGA-II / SMS-EMOA
+
+dtlz4 Prob-RVEA
+omnitest Prob-RVEA
+truss2d Prob-RVEA
+
+dtlz2 TGPR-MO
+dtlz5 TGPR-MO
+------------------------------------------------------------------------------------------------------
+
+4. 其他
+dtlz7 QR+MOEAD
+dtlz6 TGPR-MO
+omnitest DDMOEA-GAN

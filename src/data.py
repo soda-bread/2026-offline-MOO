@@ -1,7 +1,7 @@
 import numpy as np
 from pymoo.operators.sampling.lhs import LHS
 
-def generate_data(problem, sample_size, sampling, train_seed=42, val_size=100, test_size=100, test_seed=1):
+def generate_data(problem, sample_size, sampling, train_seed, val_size=100, test_size=100, test_seed=1):
     
     # Training data
     X_train = sampling(problem, sample_size, seed=train_seed).get("X")

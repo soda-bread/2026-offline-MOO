@@ -1,150 +1,139 @@
-# 2026-offline-data-driven-MOO
+# 2026-HV-misleading-issue
 
-This repository contains an offline, data-driven **multi-objective optimization (MOO)** workflow built on **NSGA-II** with multiple surrogate model options:
+Experiments for studying when the hypervolume (HV) indicator can give a
+misleading view of offline data-driven multi-objective optimization performance.
+The repository compares surrogate-assisted methods and recent probabilistic
+baselines on the same benchmark set, with shared evaluation, plotting, and
+BlueBEAR execution scripts.
 
-- **GPR (RBF)**
-- **GPR (Matern)**
-- **AutoGluon Quantile Regression (QR)**
-- **BNN Ensemble** (ensemble neural regressors for predictive uncertainty)
-
----
-
-## Notebooks
-
-Current experiment and test notebooks in this repository:
-
-- `Exp1 GPR (RBF).ipynb`
-- `Exp2 GPR (Matern).ipynb`
-- `Exp3 Autogluon_QR.ipynb`
-- `Exp4 BNN.ipynb`
-- `[Test] Autogluon_QR.ipynb`
-- `[Test] BNN.ipynb`
-
-All notebooks follow a similar flow:
-1. Install/check dependencies.
-2. Import reusable functionality from `src/`.
-3. Generate data and train surrogates.
-4. Evaluate uncertainty diagnostics (coverage / z-score / alpha search).
-5. Run NSGA-II optimization (`run_experiment`) with standard and dual-ranking survival.
-
----
-
-## Project Structure
+## Repository Layout
 
 ```text
 .
-├── Exp1 GPR (RBF).ipynb
-├── Exp2 GPR (Matern).ipynb
-├── Exp3 Autogluon_QR.ipynb
-├── Exp4 BNN.ipynb
-├── [Test] Autogluon_QR.ipynb
-├── [Test] BNN.ipynb
-├── README.md
-└── src
-    ├── data.py            # Train/validation/test data generation
-    ├── experiment.py      # NSGA-II experiment loop and metric collection
-    ├── metrics.py         # HV / IGD+ setup
-    ├── models.py          # GPR / AutoGluon-QR / BNN model wrappers and helpers
-    ├── opt_problem.py     # pymoo Problem wrapper (GPR/QR/BNN surrogate support)
-    ├── other_functions.py # Utility helpers
-    ├── plotting.py        # Plotting helpers (Pareto, z-score, etc.)
-    ├── survival.py        # Standard and dual-ranking survival operators
-    └── uncertainty.py     # Coverage and alpha search helpers
+|-- baseline/              # Adapted baseline implementations and batch helpers
+|-- bluebear/              # Standalone Python scripts for cluster execution
+|-- experiments/           # Notebook workflows for Exp1-Exp8 and plotting
+|-- results/               # Collected result tables and solution-objective files
+|-- src/                   # Shared data, model, optimizer, metric, and plot code
+|-- README.md
+`-- requirements.txt
 ```
 
----
+Generated Python caches, local environments, logs, notebook checkpoints,
+AutoGluon artifacts, and common OS/editor files are ignored by Git.
 
-## Requirements
+## Experiment Set
 
-Recommended Python version: **3.10+**
+The main experiment notebooks are in `experiments/`:
 
-Main dependencies:
+- `Exp1_GPR_RBF.ipynb`
+- `Exp2_GPR_Matern.ipynb`
+- `Exp3_Autogluon_QR.ipynb`
+- `Exp4_BNN.ipynb`
+- `Exp5_Prob_RVEA_2022.ipynb`
+- `Exp6_Prob_MOEAD_2022.ipynb`
+- `Exp7_TGPR_MO_2023.ipynb`
+- `Exp8_DDMOEA_GAN_2024.ipynb`
 
-- numpy
-- pandas
-- matplotlib
-- plotly
-- scikit-learn
-- pymoo
-- GPy
-- autogluon.tabular
-- ipython
-- jupyter
+Selected-problem test notebooks are also provided for the first four surrogate
+methods:
 
+- `Test_Exp1_GPR_RBF_selected_problems.ipynb`
+- `Test_Exp2_GPR_Matern_selected_problems.ipynb`
+- `Test_Exp3_Autogluon_QR_selected_problems.ipynb`
+- `Test_Exp4_BNN_selected_problems.ipynb`
+
+Surrogate-versus-real objective plotting notebooks live under
+`experiments/plot_sur_real/`.
+
+## Shared Configuration
+
+`experiments/config.yaml` defines the benchmark and optimizer settings used by
+the notebook workflows. The current configuration includes:
+
+- Problems: DTLZ1-DTLZ7, Omni-test, truss2d, and welded beam.
+- Objective count: 2.
+- DTLZ decision variables: 10.
+- Optimizers: NSGA-II, Dual-Ranking+NSGA-II, MOEA/D, and SMS-EMOA.
+- Seeds: 1-30 for optimizer runs, with separate train/test seeds.
+- Surrogates: GPR-RBF, GPR-Matern, AutoGluon quantile regression, and BNN.
+
+`bluebear/config.yaml` mirrors the cluster execution settings for the standalone
+scripts in `bluebear/`.
+
+## Source Modules
+
+```text
+src/
+|-- data.py             # Train/validation/test data generation
+|-- experiment.py       # Optimization loops, evaluation, and result recording
+|-- metrics.py          # HV, IGD+, and supporting metric utilities
+|-- models.py           # GPR, AutoGluon QR, and BNN model wrappers
+|-- nearest_offline.py  # Nearest-offline-sample utilities
+|-- opt_problem.py      # pymoo problem wrapper for real/surrogate objectives
+|-- other_functions.py  # Shared helper functions
+|-- plotting.py         # Pareto, HV, uncertainty, and comparison plots
+|-- survival.py         # Standard and dual-ranking survival operators
+`-- uncertainty.py      # Coverage and calibration helpers
+```
+
+## Baselines
+
+The `baseline/` directory contains adapted code and helpers for:
+
+- Prob-RVEA (2022)
+- Prob-MOEA/D (2022)
+- TGPR-MO (2023)
+- DDMOEA-GAN (2024)
+
+Use `baseline/batch_experiments.py` for local baseline batch execution where
+applicable. See the copied baseline subdirectories for their original project
+metadata and dependencies.
+
+## BlueBEAR Runs
+
+The `bluebear/` directory contains notebook-style Python scripts for running
+Exp1-Exp8 on BlueBEAR:
 
 ```bash
-python -m pip install numpy pandas matplotlib plotly scikit-learn pymoo GPy autogluon.tabular ipython jupyter
+python bluebear/bluebear_exp1_gpr_rbf.py
+python bluebear/bluebear_exp2_gpr_matern.py
+python bluebear/bluebear_exp3_autogluon_qr.py
+python bluebear/bluebear_exp4_bnn.py
+python bluebear/bluebear_exp5_prob_rvea_2022.py
+python bluebear/bluebear_exp6_prob_moead_2022.py
+python bluebear/bluebear_exp7_tgpr_mo_2023.py
+python bluebear/bluebear_exp8_ddmoea_gan_2024.py
 ```
 
-> Note: The first cell in each notebook also checks/installs core packages automatically.
+Each script writes progress to the terminal and to a matching `.log` file.
+Cluster outputs are written beside `bluebear/config.yaml` as `result.csv` and
+`result_exp1-8.txt`.
 
----
+## Setup
 
-## Quick Start
+Recommended Python version: 3.10+.
 
-### 1) Run notebooks
-
-From the repository root, launch Jupyter and run any notebook (for example `Exp1 GPR (RBF).ipynb`) top-to-bottom.
-
-Notebooks dynamically add the repo root to `sys.path`:
-
-```python
-from pathlib import Path
-import sys
-repo_root = Path.cwd().resolve()
-if str(repo_root) not in sys.path:
-    sys.path.append(str(repo_root))
-```
-
-### 2) Reuse `src/` in scripts
-
-Example imports:
-
-```python
-from src.opt_problem import build_problem
-from src.data import generate_data
-from src.experiment import run_experiment
-from src.survival import Survival_standard, Survival_dual_ranking
-```
-
----
-
-## Surrogate and Optimization Interfaces
-
-In `src/opt_problem.py`, `Benchmark_Problem` supports:
-
-- `"GPR_uncertainty"`: outputs `F` and `std`
-- `"QR_uncertainty"`: outputs `F` and `F_q80/F_q90/F_q95`
-- `"BNN_uncertainty"`: outputs `F` and `std`
-
-In `src/survival.py`, `Survival_dual_ranking` supports:
-
-- **GPR/BNN mode**: hybrid ranking using `F + alpha * std`
-- **QR mode**: hybrid ranking using selected quantile matrix via `alpha=0.8/0.9/0.95` (`F_q80/F_q90/F_q95`)
-
----
-
-## Useful Check
-
-Run a quick syntax check:
+Install the core dependencies:
 
 ```bash
-python -m py_compile src/models.py src/opt_problem.py src/survival.py src/uncertainty.py
+python -m pip install -r requirements.txt
 ```
 
----
+Main packages include `numpy`, `pandas`, `matplotlib`, `plotly`,
+`scikit-learn`, `pymoo`, `GPy`, `autogluon.tabular`, `PyYAML`, `jupyter`, and
+`pyro-ppl`.
 
-## Default Notebook Parameters
+## Quick Checks
 
-Most notebooks currently default to:
+Run a syntax check for the shared source modules:
 
-- `problem_name = "dtlz1"`
-- `n_var = 10`
-- `n_obj = 2`
-- `n_gen = 100`
-- `pop_size = 100`
+```bash
+python -m py_compile src/*.py
+```
 
-## Notes
+Check the Git working tree before committing:
 
-- Keep `problem_name` lowercase (e.g., `dtlz1`) for consistent branch handling.
-- `GPy` and `autogluon.tabular` can take longer to install depending on platform; a clean virtual environment is recommended.
+```bash
+git status --short
+```

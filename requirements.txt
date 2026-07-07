@@ -3,9 +3,12 @@ pandas
 matplotlib
 plotly
 scikit-learn
-pymoo
+pymoo==0.6.1.6
+optproblems
+diversipy
 GPy
 autogluon.tabular
 ipython
 jupyter
 PyYAML
+pyro-ppl

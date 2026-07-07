@@ -1,0 +1,21 @@
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS/editor noise
+.DS_Store
+
+# Local runtime/config artifacts
+.mplconfig/
+.ipynb_checkpoints/
+
+# Generated experiment outputs
+outputs/
+*.log
+figure_gen*.svg
+hv_curve.svg
+
+# AutoGluon training artifacts
+AutogluonModels/

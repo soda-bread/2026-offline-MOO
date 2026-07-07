@@ -4,38 +4,32 @@ from pymoo.core.problem import Problem
 from pymoo.problems import get_problem
 from pymoo.problems.multi.omnitest import OmniTest
 from pymoo.core.callback import Callback
-from IPython.display import clear_output
-import matplotlib.pyplot as plt
 
-def build_problem(problem_name, n_var=None, n_obj=None):
-    pname = problem_name.lower()
+
+def _build_real_problem(problem_name, n_var=None, n_obj=None):
+    pname = str(problem_name).lower()
 
     if "dtlz" in pname:
         if n_var is None or n_obj is None:
             raise ValueError("DTLZ problems require both n_var and n_obj.")
-        problem = get_problem(problem_name, n_var=n_var, n_obj=n_obj)
+        return get_problem(problem_name, n_var=n_var, n_obj=n_obj)
 
-    elif "omnitest" in pname:
+    if "omnitest" in pname:
         if n_var is None:
             raise ValueError("OmniTest requires n_var.")
-        problem = OmniTest(n_var=n_var)
+        return OmniTest(n_var=n_var)
 
-    else:
-        problem = get_problem(problem_name)
+    return get_problem(problem_name)
 
-    return problem
+
+def build_problem(problem_name, n_var=None, n_obj=None):
+    return _build_real_problem(problem_name, n_var=n_var, n_obj=n_obj)
 
 # Problem
 class Benchmark_Problem(Problem):
     def __init__(self, model_f1, model_f2, n_var, n_obj, xl, xu, problem_name, use_surrogate):
 
-        if 'dtlz' in problem_name:
-          self.problem = get_problem(problem_name, n_var=n_var, n_obj=n_obj)
-        elif 'omnitest' in problem_name:
-          
-          self.problem = OmniTest(n_var=n_var)
-        else:
-          self.problem = get_problem(problem_name)
+        self.problem = _build_real_problem(problem_name, n_var=n_var, n_obj=n_obj)
 
         n_constr = self.problem.n_constr if self.problem.has_constraints() else 0
 
@@ -63,16 +57,25 @@ class Benchmark_Problem(Problem):
             out["G"] = self.problem.evaluate(X, return_values_of=["G"])
 
         elif self.use_surrogate == 'BNN_uncertainty':
-          y1_mean, y1_std = self.model_f1.predict(X)
-          y2_mean, y2_std = self.model_f2.predict(X)
+          y1_mean, y1_std, y1_q80, y1_q90, y1_q95 = self.model_f1.predict_distribution(X)
+          y2_mean, y2_std, y2_q80, y2_q90, y2_q95 = self.model_f2.predict_distribution(X)
 
           y1_mean = y1_mean.reshape(-1, 1)
           y2_mean = y2_mean.reshape(-1, 1)
           y1_std = y1_std.reshape(-1, 1)
           y2_std = y2_std.reshape(-1, 1)
+          y1_q80 = y1_q80.reshape(-1, 1)
+          y2_q80 = y2_q80.reshape(-1, 1)
+          y1_q90 = y1_q90.reshape(-1, 1)
+          y2_q90 = y2_q90.reshape(-1, 1)
+          y1_q95 = y1_q95.reshape(-1, 1)
+          y2_q95 = y2_q95.reshape(-1, 1)
 
           out["F"] = np.hstack([y1_mean, y2_mean])
           out["std"] = np.hstack([y1_std, y2_std])
+          out["F_q80"] = np.hstack([y1_q80, y2_q80])
+          out["F_q90"] = np.hstack([y1_q90, y2_q90])
+          out["F_q95"] = np.hstack([y1_q95, y2_q95])
 
           if self.problem.has_constraints():
             out["G"] = self.problem.evaluate(X, return_values_of=["G"])
@@ -150,6 +153,8 @@ class EvaluatePreRealCallback(Callback):
         self.hv_real_list.append(hv_real)
 
         if self.dynamic_show:
+            from IPython.display import clear_output
+
             clear_output(wait=True)
 
         max_pre = np.max(pre, axis=0)
@@ -248,6 +253,8 @@ def evaluate_pre_real(
     }
 
     if show_plot or save_svg:
+        import matplotlib.pyplot as plt
+
         fig, ax = plt.subplots(figsize=figsize)
 
         for i in range(pre.shape[0]):
